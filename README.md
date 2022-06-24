@@ -11,3 +11,7 @@ Can inject some keyboard commands
 ```bash
 cargo build --release
 ```
+
+## TODO
+ - [ ] Save to registry selected app to be the first showing
+ - [ ] Possiblity to configure custom commands
