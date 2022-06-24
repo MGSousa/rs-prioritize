@@ -1,0 +1,11 @@
+[package]
+name = "rs-top"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lazy_static = "1.4.0"
+winapi = { version = "0.3", features = ["winnt", "winuser", "minwindef", "windef"] }
+dialoguer = "0.10.1"
+sysinfo = "0.24.3"
+windows-error = "1.1.0"
