@@ -4,7 +4,9 @@ extern crate lazy_static;
 mod program;
 mod top;
 mod windows;
+mod registry;
 
+use crate::registry::Registry;
 use std::sync::Mutex;
 use winapi::{
     shared::windef::HHOOK,
@@ -21,7 +23,11 @@ lazy_static! {
 }
 
 fn main() {
+    let registry = Registry::new();
+    registry.create();
+
     SELECTED.lock().unwrap().push_str(program::get().as_str());
+    registry.set(SELECTED.lock().unwrap().to_string()).unwrap();
 
     unsafe {
         let hook_id = winuser::SetWindowsHookExA(

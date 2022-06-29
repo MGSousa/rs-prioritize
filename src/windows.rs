@@ -7,12 +7,21 @@ use winapi::{
 };
 use windows_error::WindowsError;
 
-fn get_windows_thread_process_id(window: HWND) -> (u32, u32) {
-    let mut process_pid: u32 = 0;
-    let thread_pid = unsafe {
-        GetWindowThreadProcessId(window, &mut process_pid)
-    };
-    (process_pid, thread_pid)
+pub fn get_window_by_pid(pid: u32) -> Result<Option<HWND>, WindowsError> {
+    let mut found_window: Option<HWND> = None;
+
+    let res = enum_windows_by_until(None, |handle: HWND| {
+        let (process_pid, _) = get_windows_thread_process_id(handle);
+        if process_pid == pid {
+            found_window = Some(handle);
+            return 0;
+        }
+        1
+    });
+    if res.is_err() {
+        res.err().unwrap();
+    }
+    Ok(found_window)
 }
 
 fn enum_windows_by_until<T: FnMut(HWND) -> i32>(
@@ -42,21 +51,12 @@ fn enum_windows_by_until<T: FnMut(HWND) -> i32>(
     Ok(())
 }
 
-pub fn get_window_by_pid(pid: u32) -> Result<Option<HWND>, WindowsError> {
-    let mut found_window: Option<HWND> = None;
-
-    let res = enum_windows_by_until(None, |handle: HWND| {
-        let (process_pid, _) = get_windows_thread_process_id(handle);
-        if process_pid == pid {
-            found_window = Some(handle);
-            return 0;
-        }
-        1
-    });
-    if res.is_err() {
-        res.err().unwrap();
-    }
-    Ok(found_window)
+fn get_windows_thread_process_id(window: HWND) -> (u32, u32) {
+    let mut process_pid: u32 = 0;
+    let thread_pid = unsafe {
+        GetWindowThreadProcessId(window, &mut process_pid)
+    };
+    (process_pid, thread_pid)
 }
 
 unsafe extern "system" fn callback_enum_windows_until<T: FnMut(HWND)

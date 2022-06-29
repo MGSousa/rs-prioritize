@@ -13,5 +13,5 @@ cargo build --release
 ```
 
 ## TODO
- - [ ] Save to registry selected app to be the first showing
- - [ ] Possiblity to configure custom commands
+ - [X] Save to registry selected app to be the first showing
+ - [ ] Configure custom keyboard inputs to be passed by

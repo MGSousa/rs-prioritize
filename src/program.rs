@@ -1,3 +1,4 @@
+use crate::Registry;
 use dialoguer::{theme::ColorfulTheme, Select};
 use std::io::stdin;
 use winapi::{
@@ -40,11 +41,22 @@ pub fn get() -> String {
 }
 
 fn get_program_titles() -> Result<Vec<String>, ()> {
-    // TODO: save custom program to registry, then next time is showed with others
-    let state: Box<Vec<String>> = Box::new(vec![String::from("Open Custom Program")]);
-    let ptr = Box::into_raw(state);
-    let state;
+    let mut state: Box<Vec<String>> = Box::new(vec![String::from("Open Custom Program")]);
 
+    let reg = Registry::new();
+    let res = reg.get();
+    match res {
+        Ok(val) => {
+            if val.trim() != "" {
+                state = Box::new(vec![String::from("Open Custom Program"), val]);
+            } else {
+                println!("Retrieved empty value");
+            }
+        },
+        _ => {}
+    }
+
+    let ptr = Box::into_raw(state);
     unsafe {
         EnumWindows(Some(enumerate_windows), ptr as LPARAM);
         state = Box::from_raw(ptr);

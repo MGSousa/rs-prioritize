@@ -1,11 +1,10 @@
 use crate::windows::get_window_by_pid;
-use std::{
-    ffi::CString, process::Command,
-    process::exit,
-    sync::Mutex,
-};
+use std::{ffi::CString, mem, process::Command, process::exit, sync::Mutex};
 use sysinfo::{PidExt, ProcessExt, System, SystemExt};
-use winapi::shared::windef::HWND;
+use winapi::{
+    shared::windef::HWND,
+    um::winuser::{FindWindowA, INPUT, INPUT_KEYBOARD, SendInput, ShowWindow, SetForegroundWindow}
+};
 
 lazy_static! {
     static ref WINDOW: Mutex<String> = Mutex::new(String::new());
@@ -22,8 +21,7 @@ pub fn assign(window: String) {
     }
     println!("window: {:?}", window_name);
 
-    let handler = unsafe {
-        winapi::um::winuser::FindWindowA(std::ptr::null_mut(), window_name.as_ptr()) };
+    let handler = unsafe { FindWindowA(std::ptr::null_mut(), window_name.as_ptr()) };
     if handler.is_null() {
         match window_name.to_str() {
             Ok(name) => {
@@ -70,6 +68,11 @@ fn find_process(name: &str) -> bool {
 }
 
 unsafe fn set_top(handler: HWND) {
-    winapi::um::winuser::SetForegroundWindow(handler);
-    winapi::um::winuser::ShowWindow(handler, 9);
+    let mut input = INPUT {
+        type_: INPUT_KEYBOARD,
+        u: Default::default(),
+    };
+    SendInput(1, &mut input, mem::size_of::<INPUT>() as i32);
+    ShowWindow(handler, 9);
+    SetForegroundWindow(handler);
 }

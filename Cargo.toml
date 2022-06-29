@@ -9,3 +9,4 @@ winapi = { version = "0.3", features = ["winnt", "winuser", "minwindef", "windef
 dialoguer = "0.10.1"
 sysinfo = "0.24.3"
 windows-error = "1.1.0"
+winreg = "0.10"
