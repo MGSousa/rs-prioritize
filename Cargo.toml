@@ -10,3 +10,5 @@ dialoguer = "0.10.1"
 sysinfo = "0.24.3"
 windows-error = "1.1.0"
 winreg = "0.10"
+trayicon = { version = "0.1.3", features = ["winit"] }
+winit = "0.25.0"
