@@ -7,6 +7,7 @@ mod windows;
 mod registry;
 mod tray;
 
+use std::sync::atomic::Ordering;
 use crate::registry::Registry;
 use std::sync::Mutex;
 use winapi::{
@@ -61,23 +62,31 @@ extern "system" fn hook_callback(code: i32, wparam: usize, lparam: isize) -> isi
             };
         }
     }
-
     let keypress: KBDLLHOOKSTRUCT = unsafe { *(lparam as *mut KBDLLHOOKSTRUCT) };
 
     if wparam == WM_KEYDOWN as usize {
-        if from_virtual_key_code(keypress.vkCode) {
-            top::assign(SELECTED.lock().unwrap().to_string())
+        if !tray::PAUSED.fetch_or(false, Ordering::Relaxed) {
+            if from_virtual_key_code(keypress.vkCode) {
+                top::assign(SELECTED.lock().unwrap().to_string())
+            }
         }
     }
     0
 }
 
 // assuming nordic QWERTY layout
-// if match char: 1, 2, 3, 4
-// TODO: change this
+// TODO: make this as options
 fn from_virtual_key_code(code: u32) -> bool {
     match code {
+        // 1, 2, 3, 4 Default keys
         49..=52 => true,
+
+        // 1, 2, 3, 4 NumPad keys
+        97..=100 => true,
+
+        // Zoom In + Zoom Out keys
+        107 => true,
+        109 => true,
         _ => false,
     }
 }
