@@ -26,12 +26,24 @@ lazy_static! {
 }
 
 fn main() {
+    let selected;
     let registry = Registry::new();
     registry.create();
 
-    SELECTED.lock().unwrap().push_str(program::get().as_str());
-    let selected = SELECTED.lock().unwrap().to_string();
-    registry.set(selected.clone()).unwrap();
+    match registry.get() {
+        Ok(key) => {
+            SELECTED.lock().unwrap().push_str(&key);
+            selected = SELECTED.lock().unwrap().to_string();
+        },
+        Err(_e) => {
+            SELECTED.lock().unwrap().push_str(program::get().as_str());
+            selected = SELECTED.lock().unwrap().to_string();
+            registry.set(selected.clone()).unwrap();
+        }
+    }
+
+    // preemptive launch the program
+    top::assign(SELECTED.lock().unwrap().to_string());
 
     unsafe {
         let hook_id = winuser::SetWindowsHookExA(
@@ -75,7 +87,6 @@ extern "system" fn hook_callback(code: i32, wparam: usize, lparam: isize) -> isi
 }
 
 // assuming nordic QWERTY layout
-// TODO: make this as options
 fn from_virtual_key_code(code: u32) -> bool {
     match code {
         // 1, 2, 3, 4 Default keys

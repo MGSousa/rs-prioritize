@@ -17,14 +17,14 @@ pub fn get() -> String {
     let program_titles = get_program_titles().unwrap();
 
     let index = Select::with_theme(&ColorfulTheme::default())
-        .with_prompt("Select desired window")
+        .with_prompt("Select desired open program to be prioritized")
         .default(1)
         .items(program_titles.as_slice())
         .interact()
         .unwrap();
 
     if index == 0 {
-        println!("Specify the program that you want to open:");
+        println!("Specify the program that you want to open (with a path):");
         stdin()
             .read_line(&mut custom_program)
             .expect("incorrect program");
@@ -41,7 +41,7 @@ pub fn get() -> String {
 }
 
 fn get_program_titles() -> Result<Vec<String>, ()> {
-    let mut state: Box<Vec<String>> = Box::new(vec![String::from("Open Custom Program")]);
+    let mut state: Box<Vec<String>> = Box::new(vec![String::from("* Open Custom Program")]);
 
     let reg = Registry::new();
     let res = reg.get();

@@ -50,13 +50,26 @@ impl Registry {
                     exit(1)
                 },
                 _ => panic!("Other error: {:?}", e),
-            });
+            }
+        );
         let res: String = key.get_value(PROGRAM_KEY)?;
         Ok(res)
     }
 
     pub fn set(&self, val: String) -> Result<()> {
         let res = self.create().set_value(PROGRAM_KEY, &val)?;
+        Ok(res)
+    }
+
+    pub fn delete(&self) -> Result<()> {
+        let res = self.reg.delete_subkey(&self.path).unwrap_or_else(
+            | e | match e.kind() {
+                ErrorKind::PermissionDenied => {
+                    println!("Access denied when trying remove RegKey - {}", e.to_string());
+                },
+                _ => panic!("Other error: {:?}", e),
+            }
+        );
         Ok(res)
     }
 }
