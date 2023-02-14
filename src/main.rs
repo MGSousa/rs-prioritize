@@ -89,11 +89,11 @@ extern "system" fn hook_callback(code: i32, wparam: usize, lparam: isize) -> isi
 // assuming nordic QWERTY layout
 fn from_virtual_key_code(code: u32) -> bool {
     match code {
-        // 1, 2, 3, 4 Default keys
-        49..=52 => true,
+        // 1..5 Default keys
+        49..=53 => true,
 
-        // 1, 2, 3, 4 NumPad keys
-        97..=100 => true,
+        // 1..5 NumPad keys
+        97..=101 => true,
 
         // Zoom In + Zoom Out keys
         107 => true,
